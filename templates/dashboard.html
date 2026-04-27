@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard | ChurnAI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --bg-dark: #020617;
+            --card-bg: #0f172a;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --border: rgba(255, 255, 255, 0.08);
+            --accent-green: #10b981;
+            --accent-purple: #a855f7;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-main); display: flex; }
+
+        .sidebar { width: 280px; background: var(--card-bg); border-right: 1px solid var(--border); padding: 2rem; display: flex; flex-direction: column; gap: 2rem; position: fixed; height: 100vh; }
+        .logo { display: flex; align-items: center; gap: 0.75rem; font-size: 1.5rem; font-weight: 700; background: linear-gradient(to right, #818cf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .nav-item { display: flex; align-items: center; gap: 1rem; padding: 0.75rem 1rem; border-radius: 0.75rem; color: var(--text-dim); text-decoration: none; transition: all 0.2s; }
+        .nav-item.active { background: rgba(99, 102, 241, 0.1); color: var(--primary); border: 1px solid rgba(99, 102, 241, 0.2); }
+
+        .main-content { margin-left: 280px; flex: 1; padding: 3rem; width: calc(100% - 280px); }
+        .header { margin-bottom: 3rem; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 3rem; }
+        .stat-card { background: var(--card-bg); border-radius: 1.5rem; border: 1px solid var(--border); padding: 1.5rem; display: flex; align-items: center; gap: 1.5rem; }
+        .stat-icon { width: 50px; height: 50px; border-radius: 1rem; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; }
+        .stat-val { font-size: 1.5rem; font-weight: 700; }
+        .stat-label { color: var(--text-dim); font-size: 0.85rem; }
+
+        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem; }
+        .chart-card { background: var(--card-bg); border-radius: 1.5rem; border: 1px solid var(--border); padding: 2rem; height: 400px; }
+        .chart-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 2rem; color: var(--text-dim); }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo"><i class="fas fa-microchip"></i> <span>ChurnAI</span></div>
+        <nav style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <a href="/" class="nav-item active"><i class="fas fa-th-large"></i> Dashboard</a>
+            <a href="/predictor" class="nav-item"><i class="fas fa-chart-line"></i> Predictor</a>
+            <a href="/customers" class="nav-item"><i class="fas fa-users"></i> Customers</a>
+            <a href="/history" class="nav-item"><i class="fas fa-history"></i> History</a>
+            <a href="/settings" class="nav-item"><i class="fas fa-cog"></i> Settings</a>
+            <a href="/logout" class="nav-item" style="color: #ef4444;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <header class="header">
+            <h1>Executive Dashboard</h1>
+            <p>Real-time analytics and customer health metrics.</p>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(99, 102, 241, 0.1); color: var(--primary);"><i class="fas fa-users"></i></div>
+                <div>
+                    <div class="stat-val">{{ stats.total_customers }}</div>
+                    <div class="stat-label">Total Customers</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;"><i class="fas fa-user-slash"></i></div>
+                <div>
+                    <div class="stat-val">{{ stats.churn_rate }}%</div>
+                    <div class="stat-label">Overall Churn Rate</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;"><i class="fas fa-dollar-sign"></i></div>
+                <div>
+                    <div class="stat-val">${{ stats.avg_monthly }}</div>
+                    <div class="stat-label">Avg Monthly Charge</div>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 3rem;">
+            <h3 style="font-size: 1.1rem; color: var(--text-dim); margin-bottom: 1.5rem;"><i class="fas fa-robot"></i> AI Strategic Insights</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
+                {% for insight in stats.insights %}
+                <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 1.25rem; border-radius: 1rem; display: flex; align-items: center; gap: 1rem;">
+                    <i class="{{ insight.icon }}" style="color: {{ insight.color }}; font-size: 1.25rem;"></i>
+                    <span style="font-size: 0.9rem;">{{ insight.text }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-card">
+                <h3 class="chart-title">Contract Distribution</h3>
+                <canvas id="contractChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3 class="chart-title">Payment Methods</h3>
+                <canvas id="paymentChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Contract Chart
+        new Chart(document.getElementById('contractChart'), {
+            type: 'doughnut',
+            data: {
+                labels: {{ stats.contract_data.keys()|list|tojson }},
+                datasets: [{
+                    data: {{ stats.contract_data.values()|list|tojson }},
+                    backgroundColor: ['#6366f1', '#a855f7', '#3b82f6'],
+                    borderWidth: 0,
+                    hoverOffset: 20
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: '#94a3b8', padding: 20, font: { family: 'Outfit' } } }
+                }
+            }
+        });
+
+        // Payment Chart
+        new Chart(document.getElementById('paymentChart'), {
+            type: 'bar',
+            data: {
+                labels: {{ stats.payment_data.keys()|list|tojson }},
+                datasets: [{
+                    label: 'Customers',
+                    data: {{ stats.payment_data.values()|list|tojson }},
+                    backgroundColor: '#6366f1',
+                    borderRadius: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } },
+                    x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

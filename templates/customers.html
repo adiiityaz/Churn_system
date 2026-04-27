@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customers | ChurnAI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --bg-dark: #020617;
+            --card-bg: #0f172a;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --border: rgba(255, 255, 255, 0.08);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-main); display: flex; }
+
+        .sidebar { width: 280px; background: var(--card-bg); border-right: 1px solid var(--border); padding: 2rem; display: flex; flex-direction: column; gap: 2rem; position: fixed; height: 100vh; }
+        .logo { display: flex; align-items: center; gap: 0.75rem; font-size: 1.5rem; font-weight: 700; background: linear-gradient(to right, #818cf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .nav-item { display: flex; align-items: center; gap: 1rem; padding: 0.75rem 1rem; border-radius: 0.75rem; color: var(--text-dim); text-decoration: none; transition: all 0.2s; }
+        .nav-item.active { background: rgba(99, 102, 241, 0.1); color: var(--primary); border: 1px solid rgba(99, 102, 241, 0.2); }
+
+        .main-content { margin-left: 280px; flex: 1; padding: 3rem; width: calc(100% - 280px); }
+        .header { margin-bottom: 3rem; }
+        .header h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+
+        .table-container { background: var(--card-bg); border-radius: 1.5rem; border: 1px solid var(--border); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { padding: 1.25rem 1rem; border-bottom: 1px solid var(--border); color: var(--text-dim); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        td { padding: 1.25rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.95rem; }
+        tr:hover { background: rgba(255,255,255,0.02); }
+
+        .status-pill { padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 600; }
+        .churn-yes { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+        .churn-no { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo"><i class="fas fa-microchip"></i> <span>ChurnAI</span></div>
+        <nav style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <a href="/" class="nav-item"><i class="fas fa-th-large"></i> Dashboard</a>
+            <a href="/predictor" class="nav-item"><i class="fas fa-chart-line"></i> Predictor</a>
+            <a href="/customers" class="nav-item active"><i class="fas fa-users"></i> Customers</a>
+            <a href="/history" class="nav-item"><i class="fas fa-history"></i> History</a>
+            <a href="/settings" class="nav-item"><i class="fas fa-cog"></i> Settings</a>
+            <a href="/logout" class="nav-item" style="color: #ef4444;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <header class="header">
+            <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                <div>
+                    <h1>Customer Database</h1>
+                    <p>Viewing latest 50 records from the Telco dataset.</p>
+                </div>
+                <div style="display: flex; gap: 1rem;">
+                    <div style="position: relative;">
+                        <i class="fas fa-search" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-dim);"></i>
+                        <input type="text" id="searchInput" placeholder="Search customers..." style="background: var(--card-bg); border: 1px solid var(--border); padding: 0.75rem 1rem 0.75rem 2.5rem; border-radius: 0.75rem; color: white; width: 300px;">
+                    </div>
+                    <select id="churnFilter" style="background: var(--card-bg); border: 1px solid var(--border); padding: 0.75rem; border-radius: 0.75rem; color: white;">
+                        <option value="all">All Status</option>
+                        <option value="Yes">Churned</option>
+                        <option value="No">Active</option>
+                    </select>
+                </div>
+            </div>
+        </header>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Customer Name</th>
+                        <th>Gender</th>
+                        <th>Tenure</th>
+                        <th>Internet</th>
+                        <th>Contract</th>
+                        <th>Monthly</th>
+                        <th>Total</th>
+                        <th>Churn</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for customer in customers %}
+                    <tr>
+                        <td style="font-weight: 600;">{{ customer.CustomerName }}</td>
+                        <td>{{ customer.gender }}</td>
+                        <td>{{ customer.tenure }}m</td>
+                        <td>{{ customer.InternetService }}</td>
+                        <td>{{ customer.Contract }}</td>
+                        <td>${{ customer.MonthlyCharges }}</td>
+                        <td>${{ customer.TotalCharges }}</td>
+                        <td>
+                            <span class="status-pill {% if customer.Churn == 'Yes' %}churn-yes{% else %}churn-no{% endif %}">
+                                {{ customer.Churn }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const churnFilter = document.getElementById('churnFilter');
+        const tableRows = document.querySelectorAll('tbody tr');
+
+        function filterTable() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const filterValue = churnFilter.value;
+
+            tableRows.forEach(row => {
+                const name = row.cells[0].textContent.toLowerCase();
+                const churnStatus = row.cells[7].textContent.trim();
+                
+                const matchesSearch = name.includes(searchTerm);
+                const matchesFilter = filterValue === 'all' || churnStatus === filterValue;
+
+                if (matchesSearch && matchesFilter) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        searchInput.addEventListener('input', filterTable);
+        churnFilter.addEventListener('change', filterTable);
+    </script>
+</body>
+</html>

@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Churn Analytics AI | Enterprise Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.5);
+            --secondary: #a855f7;
+            --bg-dark: #020617;
+            --card-bg: #0f172a;
+            --input-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --border: rgba(255, 255, 255, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            background-image: 
+                radial-gradient(circle at 0% 0%, rgba(99, 102, 241, 0.15) 0%, transparent 35%),
+                radial-gradient(circle at 100% 100%, rgba(168, 85, 247, 0.1) 0%, transparent 35%);
+        }
+
+        /* Sidebar Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--card-bg);
+            border-right: 1px solid var(--border);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            position: fixed;
+            height: 100vh;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            color: var(--text-dim);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .nav-item.active {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 3rem;
+            max-width: 1200px;
+        }
+
+        .header {
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: var(--text-dim);
+            font-size: 1.1rem;
+        }
+
+        /* Form Grid */
+        .glass-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .form-section {
+            margin-bottom: 2.5rem;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--primary);
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        select, input {
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 0.85rem 1rem;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+        }
+
+        /* Predict Button */
+        .btn-predict {
+            width: 100%;
+            padding: 1.25rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 1rem;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            box-shadow: 0 10px 25px -5px var(--primary-glow);
+        }
+
+        .btn-predict:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 30px -10px var(--primary-glow);
+            filter: brightness(1.1);
+        }
+
+        /* Results Display */
+        .result-overlay {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            width: 380px;
+            z-index: 100;
+            animation: slideIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(120%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .result-card {
+            background: var(--card-bg);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+        }
+
+        .result-card.churn::before { background: var(--accent-red); }
+        .result-card.no-churn::before { background: var(--accent-green); }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+
+        .churn .status-badge { background: rgba(239, 68, 68, 0.15); color: var(--accent-red); }
+        .no-churn .status-badge { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); }
+
+        .confidence-circle {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 1.5rem;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .confidence-val {
+            font-size: 1.75rem;
+            font-weight: 800;
+        }
+
+        /* SVG Progress */
+        svg.progress-ring {
+            position: absolute;
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.5s;
+            stroke-dasharray: 326.72;
+            stroke-dashoffset: 326.72;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 1.5rem; }
+            .result-overlay { position: static; width: 100%; margin-bottom: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <i class="fas fa-microchip"></i>
+            <span>ChurnAI</span>
+        </div>
+        <nav style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <a href="/" class="nav-item"><i class="fas fa-th-large"></i> Dashboard</a>
+            <a href="/predictor" class="nav-item active"><i class="fas fa-chart-line"></i> Predictor</a>
+            <a href="/customers" class="nav-item"><i class="fas fa-users"></i> Customers</a>
+            <a href="/history" class="nav-item"><i class="fas fa-history"></i> History</a>
+            <a href="/settings" class="nav-item"><i class="fas fa-cog"></i> Settings</a>
+            <a href="/logout" class="nav-item" style="color: #ef4444;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+        
+        <div style="margin-top: auto; padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 1rem; border: 1px solid var(--border);">
+            <p style="font-size: 0.8rem; color: var(--text-dim); margin-bottom: 0.5rem;">System Health</p>
+            <div style="height: 4px; background: #334155; border-radius: 2px;">
+                <div style="width: 98%; height: 100%; background: var(--accent-green); border-radius: 2px;"></div>
+            </div>
+            <p style="font-size: 0.75rem; color: var(--accent-green); margin-top: 0.5rem;">Model Online: v2.4.0</p>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <header class="header">
+            <h1>Customer Prediction</h1>
+            <p>Leverage Enterprise AI to anticipate customer behavior with 78.4% precision.</p>
+        </header>
+
+        {% if prediction_text %}
+        <div class="result-overlay">
+            <div class="result-card {{ result_class }}">
+                <div class="result-header">
+                    <span style="font-weight: 600; font-size: 1.1rem;">Inference Result</span>
+                    <span class="status-badge">{{ prediction_text.split(': ')[1] }}</span>
+                </div>
+                
+                <div class="confidence-circle">
+                    <svg class="progress-ring" width="120" height="120">
+                        <circle class="progress-ring__circle" stroke="{% if result_class == 'churn' %}#ef4444{% else %}#10b981{% endif %}" stroke-width="8" fill="transparent" r="52" cx="60" cy="60"/>
+                    </svg>
+                    <div class="confidence-val">{{ confidence_text.split(': ')[1] }}</div>
+                </div>
+                
+                <p style="text-align: center; color: var(--text-dim); font-size: 0.9rem; line-height: 1.5;">
+                    The model identifies patterns consistent with 
+                    <strong>{% if result_class == 'churn' %}high-risk churn behavior{% else %}stable customer retention{% endif %}</strong>.
+                </p>
+                
+                <button onclick="this.parentElement.parentElement.remove()" style="width: 100%; margin-top: 1.5rem; background: transparent; border: 1px solid var(--border); color: var(--text-dim); padding: 0.5rem; border-radius: 0.5rem; cursor: pointer;">Dismiss</button>
+            </div>
+        </div>
+        {% endif %}
+
+        <form action="/predict" method="POST" class="glass-card">
+            <!-- Section 1: Customer Profile -->
+            <div class="form-section">
+                <h2 class="section-title"><i class="fas fa-user-circle"></i> Personal Profile</h2>
+                <div class="grid-layout">
+                    <div class="input-group">
+                        <label>Gender</label>
+                        <select name="gender">
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Senior Status</label>
+                        <select name="SeniorCitizen">
+                            <option value="0">Regular Citizen</option>
+                            <option value="1">Senior Citizen</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Marital Partner</label>
+                        <select name="Partner">
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Dependents</label>
+                        <select name="Dependents">
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Loyalty Tenure (Months)</label>
+                        <input type="number" name="tenure" value="12" min="0">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2: Services & Subscriptions -->
+            <div class="form-section">
+                <h2 class="section-title"><i class="fas fa-server"></i> Services Ecosystem</h2>
+                <div class="grid-layout">
+                    <div class="input-group">
+                        <label>Phone Line</label>
+                        <select name="PhoneService">
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Multiple Lines</label>
+                        <select name="MultipleLines">
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No phone service">N/A</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Internet Protocol</label>
+                        <select name="InternetService">
+                            <option value="Fiber optic">Fiber optic</option>
+                            <option value="DSL">DSL</option>
+                            <option value="No">None</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Online Security</label>
+                        <select name="OnlineSecurity">
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No internet service">N/A</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Cloud Backup</label>
+                        <select name="OnlineBackup">
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No internet service">N/A</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Device Protection</label>
+                        <select name="DeviceProtection">
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No internet service">N/A</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Technical Support</label>
+                        <select name="TechSupport">
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No internet service">N/A</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Streaming TV</label>
+                        <select name="StreamingTV">
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No internet service">N/A</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Streaming Movies</label>
+                        <select name="StreamingMovies">
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No internet service">N/A</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3: Billing & Financials -->
+            <div class="form-section" style="margin-bottom: 0;">
+                <h2 class="section-title"><i class="fas fa-credit-card"></i> Financial Configuration</h2>
+                <div class="grid-layout">
+                    <div class="input-group">
+                        <label>Contract Type</label>
+                        <select name="Contract">
+                            <option value="Month-to-month">Month-to-month</option>
+                            <option value="One year">One year</option>
+                            <option value="Two year">Two year</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Billing Preference</label>
+                        <select name="PaperlessBilling">
+                            <option value="Yes">Paperless</option>
+                            <option value="No">Mailed Paper</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Payment Mode</label>
+                        <select name="PaymentMethod">
+                            <option value="Electronic check">Electronic check</option>
+                            <option value="Mailed check">Mailed check</option>
+                            <option value="Bank transfer (automatic)">Bank transfer (automatic)</option>
+                            <option value="Credit card (automatic)">Credit card (automatic)</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Monthly Subscription</label>
+                        <input type="number" step="0.01" name="MonthlyCharges" value="70.00">
+                    </div>
+                    <div class="input-group">
+                        <label>Total Life Value</label>
+                        <input type="number" step="0.01" name="TotalCharges" value="840.00">
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-predict">
+                <i class="fas fa-bolt"></i> ANALYZE CUSTOMER CHURN
+            </button>
+        </form>
+    </div>
+
+    <script>
+        // Simple SVG animation for confidence circle
+        const circle = document.querySelector('.progress-ring__circle');
+        if (circle) {
+            const confidence = parseFloat("{{ confidence_text.split(': ')[1] if confidence_text else '0' }}");
+            const radius = circle.r.baseVal.value;
+            const circumference = radius * 2 * Math.PI;
+            
+            circle.style.strokeDasharray = `${circumference} ${circumference}`;
+            const offset = circumference - (confidence / 100 * circumference);
+            
+            setTimeout(() => {
+                circle.style.strokeDashoffset = offset;
+            }, 100);
+        }
+    </script>
+</body>
+</html>
