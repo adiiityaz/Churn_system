@@ -1,79 +1,81 @@
-# 🚀 Telco Customer Churn Prediction System
+# 🚀 ChurnAI: Telco Customer Retention System
 
-An end-to-end machine learning solution designed to predict customer attrition (churn) for telecommunications providers. This project features a robust data science pipeline and a modern, high-performance web interface for real-time inference.
+An end-to-end AI-driven solution designed to predict and visualize customer attrition for telecommunications providers. This system features a robust machine learning pipeline and a premium, executive-grade dashboard for real-time analytics and inference.
 
 ## 📋 Table of Contents
-- [Overview](#overview)
-- [Key Features](#key-features)
-- [Technology Stack](#technology-stack)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Model Performance](#model-performance)
-- [Project Structure](#project-structure)
+- [Executive Dashboard](#-executive-dashboard)
+- [Key Features](#-key-features)
+- [Technology Stack](#-technology-stack)
+- [Installation & Setup](#-installation--setup)
+- [Model Architecture](#-model-architecture)
+- [Project Structure](#-project-structure)
 
-## 🔍 Overview
-Predicting customer churn is critical for the telecommunications industry to improve retention strategies and customer lifetime value. This system analyzes historical customer behavior—including service usage, contract types, and demographics—to identify high-risk accounts before they leave.
+## 📊 Executive Dashboard
+The system provides a high-end web interface featuring:
+- **Real-time Analytics**: Interactive charts for contract distribution and payment methods.
+- **AI Strategic Insights**: Automated alerts for high-risk customer segments (e.g., Fiber Optic users).
+- **Customer Database**: A searchable directory of 7,000+ customer records with instant churn status visibility.
+- **Inference History**: Audit log of all AI predictions and confidence scores.
 
 ## ✨ Key Features
-- **End-to-End Pipeline**: Handles everything from raw data ingestion to model deployment.
-- **SMOTE Balancing**: Implements Synthetic Minority Oversampling Technique (SMOTE) to handle class imbalance in churn data.
-- **Modern Web UI**: A premium, dark-mode web interface built with Flask and modern CSS for intuitive user interaction.
-- **Persistence**: Pre-trained models and encoders are serialized using Pickle for instant loading and inference.
-- **Real-time Scoring**: Provides both churn prediction and a confidence probability score for every input.
+- **Modern UI/UX**: Premium dark-mode interface built with Vanilla CSS and Outfit typography.
+- **SMOTE Balancing**: Handles class imbalance to ensure high recall for churners.
+- **Enterprise Security**: Role-based access control with secure login session management.
+- **Real-time Scoring**: Instant inference with probabilistic confidence circles.
 
 ## 💻 Technology Stack
-- **Languages**: Python, HTML5, CSS3
-- **Frameworks**: Flask (Web Backend)
-- **Data Science**: 
-  - Pandas & NumPy (Processing)
-  - Scikit-learn (Modelling & Evaluation)
-  - Imbalanced-learn (SMOTE)
-  - XGBoost & Random Forest (Ensemble Learning)
+- **Backend**: Python / Flask
+- **Data Science**: Scikit-Learn, Pandas, NumPy, Imbalanced-Learn (SMOTE)
+- **Frontend**: HTML5, Vanilla CSS, Chart.js, FontAwesome
 
-## 🛠️ Installation
+## 🛠️ Installation & Setup
 
 1. **Clone the repository**:
    ```bash
-   git clone <repository-url>
-   cd "Churn _system"
+   git clone https://github.com/adiiityaz/Churn_system.git
+   cd Churn_system
    ```
 
 2. **Install dependencies**:
    ```bash
-   pip install pandas scikit-learn imbalanced-learn Flask xgboost matplotlib seaborn
+   pip install pandas scikit-learn imbalanced-learn Flask matplotlib seaborn
    ```
 
-## 🚀 Usage
+3. **Train the AI Model**:
+   Generate the latest model and encoders from the Telco dataset:
+   ```bash
+   python churn_analysis.py
+   ```
 
-### 1. Training the Model
-Run the analysis script to process the data, train the model, and generate the necessary serialized files (`.pkl`):
-```bash
-python churn_analysis.py
-```
+4. **Launch the Portal**:
+   ```bash
+   python app.py
+   ```
+   Access at `http://127.0.0.1:5000`
 
-### 2. Launching the Web Interface
-Start the Flask web server to access the graphical predictor:
-```bash
-python app.py
-```
-Visit `http://127.0.0.1:5000` in your web browser.
+### 🔑 Demo Credentials
+- **Username**: `admin`
+- **Password**: `admin123`
 
-## 📈 Model Performance
-The current production model uses a **Random Forest Classifier** with the following metrics:
-- **Overall Accuracy**: ~78%
-- **Class Balancing**: SMOTE applied for improved recall on churners.
-- **Optimization**: Hyperparameter tuning performed via cross-validation.
+## 📈 Model Architecture
+The system utilizes a **Random Forest Classifier** optimized for the Telco dataset:
+- **Accuracy**: ~78%
+- **Preprocessing**: Label Encoding for categorical features, TotalCharges cleanup.
+- **Handling Imbalance**: SMOTE (Synthetic Minority Over-sampling Technique) applied during training.
 
 ## 📂 Project Structure
 ```text
 ├── WA_Fn-UseC_-Telco-Customer-Churn.csv  # Dataset
-├── Customer_Churn_Prediction_using_ML.ipynb # Research Notebook
-├── churn_analysis.py                      # Main training script
-├── app.py                                 # Flask application
-├── templates/                             # Web UI components
-│   └── index.html                         # Main interface
-├── churn_model.pkl                        # Serialized model (auto-generated)
-├── encoders.pkl                           # Serialized encoders (auto-generated)
+├── churn_analysis.py                      # Model training & pipeline
+├── app.py                                 # Flask server & logic
+├── templates/                             # UI Components
+│   ├── dashboard.html                     # Analytics view
+│   ├── index.html                         # Predictor interface
+│   ├── customers.html                     # Searchable database
+│   ├── history.html                       # Inference logs
+│   ├── login.html                         # Access portal
+│   └── settings.html                      # System info
+├── .gitignore                             # Environment protection
 └── README.md                              # Documentation
 ```
 
