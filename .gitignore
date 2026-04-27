@@ -8,8 +8,5 @@ venv/
 ENV/
 scratch/
 .gemini/
-*.pkl
-# Large models are often ignored, but user might want them. 
-# Given the instructions, I'll keep them out of git if they are too big, 
-# but 22MB is okay for a small project. 
-# Actually, I'll exclude .pkl to keep the repo clean and let user decide if they want to add them.
+# Large models are often ignored, but required for Vercel deployment if not trained on build.
+# *.pkl
