@@ -1,4 +1,4 @@
-# 🚀 ChurnAI: Telco Customer Retention System
+# 🚀 ChurnAI: Customer Retention System
 
 An end-to-end AI-driven solution designed to predict and visualize customer attrition for telecommunications providers. This system features a robust machine learning pipeline and a premium, executive-grade dashboard for real-time analytics and inference.
 
